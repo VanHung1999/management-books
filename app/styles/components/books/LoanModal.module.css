@@ -1,0 +1,340 @@
+/* LoanModal Component Styles */
+
+/* Modal Title */
+.modalTitle {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 18px;
+  font-weight: 600;
+  color: #1f1f1f;
+}
+
+.titleIcon {
+  font-size: 24px;
+}
+
+/* Modal Content Container */
+.modalContent {
+  padding: 20px 0;
+}
+
+/* Book Information Section */
+.bookInfoSection {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px;
+  background-color: #f8f9fa;
+  border-radius: 12px;
+  border: 1px solid #e9ecef;
+  margin-bottom: 24px;
+}
+
+.bookCoverImage {
+  width: 80px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.bookDetails {
+  flex: 1;
+}
+
+.bookName {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1f1f1f;
+  margin-bottom: 8px;
+}
+
+.bookAuthor {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 4px;
+}
+
+.bookCategory {
+  font-size: 14px;
+  color: #666;
+}
+
+/* Book Statistics Grid */
+.bookStatsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.statCard {
+  text-align: center;
+  padding: 16px;
+  border-radius: 8px;
+}
+
+.statCardAvailable {
+  background-color: #f6ffed;
+  border: 1px solid #b7eb8f;
+}
+
+.statCardLoaned {
+  background-color: #fff7e6;
+  border: 1px solid #ffd591;
+}
+
+.statNumber {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+
+.statNumberAvailable {
+  color: #52c41a;
+}
+
+.statNumberLoaned {
+  color: #fa8c16;
+}
+
+.statLabel {
+  font-size: 14px;
+}
+
+.statLabelAvailable {
+  color: #52c41a;
+}
+
+.statLabelLoaned {
+  color: #fa8c16;
+}
+
+/* Quantity Selection Section */
+.quantitySection {
+  padding: 20px;
+  background-color: #f0f8ff;
+  border-radius: 12px;
+  border: 1px solid #d6e4ff;
+}
+
+.quantityTitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1890ff;
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+.quantityInputContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+}
+
+.quantityInput {
+  width: 120px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.quantityInputAddon {
+  font-size: 14px;
+  color: #666;
+}
+
+.quantityMaxInfo {
+  text-align: center;
+  margin-top: 12px;
+  font-size: 14px;
+  color: #666;
+}
+
+.quantityMaxNumber {
+  color: #1890ff;
+  font-weight: 600;
+}
+
+/* Notification Section */
+.notificationSection {
+  padding: 16px;
+  background-color: #fff2e8;
+  border-radius: 8px;
+  border: 1px solid #ffd591;
+  margin-top: 16px;
+}
+
+.notificationContent {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #d46b08;
+}
+
+.notificationIcon {
+  font-size: 16px;
+}
+
+.notificationText {
+  font-weight: 600;
+}
+
+/* Confirm Button */
+.confirmButton {
+  background: linear-gradient(135deg, #52c41a 0%, #389e0d 100%);
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .modalContent {
+    padding: 16px 0;
+  }
+  
+  .bookInfoSection {
+    padding: 16px;
+    margin-bottom: 20px;
+  }
+  
+  .bookCoverImage {
+    width: 60px;
+    height: 75px;
+  }
+  
+  .bookName {
+    font-size: 14px;
+  }
+  
+  .bookAuthor,
+  .bookCategory {
+    font-size: 12px;
+  }
+  
+  .bookStatsGrid {
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  
+  .statCard {
+    padding: 12px;
+  }
+  
+  .statNumber {
+    font-size: 20px;
+  }
+  
+  .statLabel {
+    font-size: 12px;
+  }
+  
+  .quantitySection {
+    padding: 16px;
+  }
+  
+  .quantityTitle {
+    font-size: 14px;
+    margin-bottom: 12px;
+  }
+  
+  .quantityInput {
+    width: 100px;
+    font-size: 14px;
+  }
+  
+  .quantityInputAddon {
+    font-size: 12px;
+  }
+  
+  .quantityMaxInfo {
+    font-size: 12px;
+  }
+  
+  .notificationSection {
+    padding: 12px;
+    margin-top: 12px;
+  }
+  
+  .notificationContent {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .modalContent {
+    padding: 12px 0;
+  }
+  
+  .bookInfoSection {
+    padding: 12px;
+    margin-bottom: 16px;
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .bookCoverImage {
+    width: 50px;
+    height: 62px;
+  }
+  
+  .bookName {
+    font-size: 13px;
+  }
+  
+  .bookAuthor,
+  .bookCategory {
+    font-size: 11px;
+  }
+  
+  .bookStatsGrid {
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  
+  .statCard {
+    padding: 10px;
+  }
+  
+  .statNumber {
+    font-size: 18px;
+  }
+  
+  .statLabel {
+    font-size: 11px;
+  }
+  
+  .quantitySection {
+    padding: 12px;
+  }
+  
+  .quantityTitle {
+    font-size: 13px;
+    margin-bottom: 10px;
+  }
+  
+  .quantityInput {
+    width: 80px;
+    font-size: 13px;
+  }
+  
+  .quantityInputAddon {
+    font-size: 11px;
+  }
+  
+  .quantityMaxInfo {
+    font-size: 11px;
+  }
+  
+  .notificationSection {
+    padding: 10px;
+    margin-top: 10px;
+  }
+  
+  .notificationContent {
+    font-size: 11px;
+  }
+}
