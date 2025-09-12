@@ -1,0 +1,116 @@
+/* Register Page Styles */
+@import '../../theme-variables.css';
+
+.container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  flex-direction: column;
+  background-color: var(--bg-container);
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.title {
+  font-size: var(--font-size-title);
+  font-weight: var(--font-weight-bold);
+  color: var(--text-title);
+  margin: 0;
+  text-shadow: var(--shadow-title);
+}
+
+.registerCard {
+  width: 420px;
+  margin-top: var(--spacing-md);
+  text-align: center;
+  border: var(--border-card);
+  box-shadow: var(--shadow-card);
+  background-color: var(--bg-primary);
+  border-radius: var(--radius-md);
+}
+
+.cardTitle {
+  text-align: center;
+  color: var(--text-card-title);
+  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-xxl);
+}
+
+.registerForm {
+  padding: var(--spacing-lg) 0;
+}
+
+.input {
+  border-radius: var(--radius-md);
+  border: var(--border-input);
+  transition: all var(--transition-normal);
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+.input:focus {
+  border-color: var(--border-focus);
+  box-shadow: var(--shadow-input-focus);
+}
+
+.registerButton {
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-hover) 100%);
+  border: none;
+  border-radius: var(--radius-md);
+  font-weight: var(--font-weight-semibold);
+  height: 48px;
+  font-size: var(--font-size-md);
+  box-shadow: var(--shadow-button);
+  transition: all var(--transition-normal);
+  color: var(--text-inverse);
+}
+
+.registerButton:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-button-hover);
+}
+
+.actionsContainer {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-lg) 0 0 0;
+  border-top: var(--border-divider);
+}
+
+.link {
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-size: var(--font-size-sm);
+  transition: all var(--transition-normal);
+}
+
+.link:hover {
+  color: var(--primary-hover);
+  text-decoration: underline;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .container {
+    padding: var(--spacing-md);
+  }
+  
+  .title {
+    font-size: 2rem;
+  }
+  
+  .registerCard {
+    width: 100%;
+    max-width: 400px;
+  }
+}
+
+/* Dark Mode Support - Handled by theme variables */
+
