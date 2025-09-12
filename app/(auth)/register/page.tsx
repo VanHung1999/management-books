@@ -1,12 +1,15 @@
 "use client";   
  
+import React, { useEffect } from "react";
 import { Button, Card, Form, Input, message } from "antd";
 import { LockOutlined, MailOutlined, UserOutlined } from "@ant-design/icons";
 import styles from "../../styles/pages/auth/Register.module.css";
 import { useRouter } from "next/navigation";
 import { useDataProvider, useForm } from "@refinedev/core";
 import Link from "next/link";
-import { useEffect } from "react";
+import { RESOURCES, VALIDATION_RULES, REGEX_PATTERNS, ROUTES, REDIRECTS } from "../../../constants";
+import { validateEmailExists, validatePassword, validateConfirmPassword } from "../../../utils/validation";
+import { createRegistrationHandler } from "../../../utils/formHandlers";
         
 export default function Register() {
   const router = useRouter();
@@ -15,18 +18,20 @@ export default function Register() {
 
   const { onFinish, mutation } = useForm({
     action: "create",
-    resource: "users",
+    resource: RESOURCES.USERS.CREATE,
   });
+
+  // Create form handlers
+  const formHandlers = createRegistrationHandler(router, mutation);
 
   useEffect(() => {
     if (mutation.isSuccess) {
-      message.success("Registration successful! Redirecting to login...");
-      router.push("/login");
+      formHandlers.onSuccess();
     }
     if (mutation.isError) {
-      message.error('Registration error: ' + (mutation.error?.message || 'Unknown error'));
+      formHandlers.onError(mutation.error);
     }
-  }, [mutation.isSuccess, mutation.isError, mutation.error, router]);
+  }, [mutation.isSuccess, mutation.isError, mutation.error, formHandlers]);
 
   return (
     <div className={styles.container}>
@@ -54,25 +59,13 @@ export default function Register() {
           hasFeedback
           validateTrigger="onBlur"
           rules={[
-            { required: true, message: "Please enter your email" },
-            { type: "email", message: "Please enter a valid email" },
+            { required: VALIDATION_RULES.EMAIL.required, message: VALIDATION_RULES.EMAIL.message },
+            { 
+              pattern: REGEX_PATTERNS.EMAIL, 
+              message: VALIDATION_RULES.EMAIL.message 
+            },
             {
-              validator: async (_rule, value) => {
-                if (!value) return Promise.resolve();
-                try {
-                  const dp = getDataProvider();
-                  const { data } = await dp.getOne({
-                    resource: "users",
-                    id: value,
-                  });
-                  if (data) {
-                    return Promise.reject("Email has already been used");
-                  }
-                  return Promise.resolve();
-                } catch {
-                  return Promise.resolve();
-                }
-              },
+              validator: async (_rule, value) => validateEmailExists(getDataProvider, value),
             },
           ]}
         >
@@ -88,12 +81,13 @@ export default function Register() {
           label="Password"
           name="password"
           rules={[
-            { required: true, message: "Please enter your password" },
-            { min: 7, message: "Password must be longer than 6 characters" },
+            { required: VALIDATION_RULES.PASSWORD.required, message: VALIDATION_RULES.PASSWORD.message },
+            { 
+              pattern: REGEX_PATTERNS.PASSWORD_MEDIUM, 
+              message: VALIDATION_RULES.PASSWORD.message 
+            },
             {
-              pattern: /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]+$/,
-              message:
-                "Password must contain both letters and numbers (letters/numbers only)",
+              validator: (_rule, value) => validatePassword(value),
             },
           ]}
         >
@@ -112,12 +106,7 @@ export default function Register() {
           rules={[
             { required: true, message: "Please confirm your password" },
             ({ getFieldValue }) => ({
-              validator(_, value) {
-                if (!value || getFieldValue("password") === value) {
-                  return Promise.resolve();
-                }
-                return Promise.reject("The two passwords do not match");
-              },
+              validator: validateConfirmPassword(getFieldValue),
             }),
           ]}
         >
@@ -133,7 +122,11 @@ export default function Register() {
           label="Name"
           name="name"
           rules={[
-            { required: true, message: "Please enter your name" },
+            { required: VALIDATION_RULES.NAME.required, message: VALIDATION_RULES.NAME.message },
+            { 
+              pattern: REGEX_PATTERNS.NAME, 
+              message: VALIDATION_RULES.NAME.message 
+            },
           ]}
         >
           <Input
@@ -158,8 +151,8 @@ export default function Register() {
         </Form.Item>
         </Form>
         <div className={styles.actionsContainer}>
-          <Link className={styles.link} href="/login">Back to Login</Link>
-          <Link className={styles.link} href="/forgot-password">Forgot password</Link>
+          <Link className={styles.link} href={ROUTES.LOGIN}>Back to Login</Link>
+          <Link className={styles.link} href={ROUTES.FORGOT_PASSWORD}>Forgot password</Link>
         </div>
       </Card>
     </div>
