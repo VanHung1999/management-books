@@ -1,29 +1,44 @@
 "use client";
 
-import { Alert, Button, Card, Form, Input } from "antd";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
+import { Alert, Button, Card, Form, Input, Modal } from "antd";
 import { useDataProvider, useUpdate} from "@refinedev/core";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import styles from "../../styles/pages/auth/ForgotPassword.module.css";
-import { User } from "@/app/types/user";
+import { forgotPasswordSchema, resetPasswordSchema, ForgotPasswordFormData, ResetPasswordFormData } from "../../../utils/validation-schemas";
+import { useZodValidation } from "../../../utils/useZodValidation";
+import { generateOTP } from "../../../utils/otp";
+import { createAuthService, User } from "../../../utils/services";
+import "../../styles/theme-variable.css";
+
+// User type is now imported from services
+import styles from '../../styles/pages/auth/ForgotPassword.module.css';
 
 export default function ForgotPassword() {
-    const [form] = Form.useForm();
-    const [oTpform] = Form.useForm();
     const [generatedOtp, setGeneratedOtp] = useState<string>("");
     const [alert, setAlert] = useState<{ type: "success" | "error" | "info"; text: string } | null>(null);
     const [status, setStatus] = useState<"enterEmail" | "verifyOtp" | "done">("enterEmail");
     const [email, setEmail] = useState<string>("");
     const [user, setUser] = useState<User | null>(null);
+    const [showPasswordModal, setShowPasswordModal] = useState<boolean>(false);
+    const [newPassword, setNewPassword] = useState<string>("");
+    const [confirmPassword, setConfirmPassword] = useState<string>("");
     const getDataProvider = useDataProvider();
     const router = useRouter();
+    
+    // Initialize auth service
+    const authService = createAuthService(getDataProvider());
+    
+    // Zod validation hooks
+    const { form, validateAndSetErrors: validateEmailForm } = useZodValidation(forgotPasswordSchema);
+    const { form: otpForm, validateAndSetErrors: validateOtpForm } = useZodValidation(resetPasswordSchema);
+    
     const { mutate: updateUser } = useUpdate(
       { resource: "users" ,
         mutationOptions: {
           onSuccess: (data: any) => {
             setStatus("done");
-            setAlert({ type: "success", text: "Password has been reset to 12345678." });
+            setAlert({ type: "success", text: "Password reset link has been sent to your email. Please check your inbox and follow the instructions." });
           },
           onError: (error: any) => {
             setAlert({ type: "error", text: "Cannot reset password. Please try again." });
@@ -32,43 +47,98 @@ export default function ForgotPassword() {
       }   
     );
 
-    const onSubmitEmail = async (values: any) => {
-        try {
-            const dp = getDataProvider();
-            const userResult = await dp.getOne({ resource: "users", id: values.email });
-            setUser(userResult.data as User);
-            const code = Math.floor(100000 + Math.random() * 900000).toString();
-            setGeneratedOtp(code);
-            setEmail(values.email);
-            setStatus("verifyOtp");
-            setAlert({ type: "info", text: `OTP (demo): ${code}` });
-        } catch (error) {
-            setAlert({ type: "error", text: "Email has not been registered" });
-        }
-    }
-    
-    const onSubmitOtp = async (values: any) => {
-        if(values.otp !== generatedOtp){
-            setAlert({ type: "error", text: "OTP is incorrect. Please try again." });
+    const onSubmitEmail = async (values: ForgotPasswordFormData) => {
+        // Validate with Zod
+        const validationResult = await validateEmailForm(values);
+        if (!validationResult.success) {
             return;
         }
-        updateUser({id: user?.id, values: { password: "12345678" } });  
+
+        // Use auth service to find user
+        const userResult = await authService.findUserByEmail(values.email);
+        if (!userResult.success) {
+            setAlert({ type: "error", text: userResult.error || "Email has not been registered" });
+            return;
+        }
+
+        // Generate OTP using service
+        const otpResult = await authService.generateOTPForPasswordReset(values.email);
+        if (!otpResult.success) {
+            setAlert({ type: "error", text: otpResult.error || "Failed to generate OTP" });
+            return;
+        }
+
+        // Set state
+        setUser(userResult.data);
+        setGeneratedOtp(otpResult.otp!);
+        setEmail(values.email);
+        setStatus("verifyOtp");
+        setAlert({ type: "info", text: `OTP (demo): ${otpResult.otp}` });
     }
     
-    useEffect(() => {
-        if (status === "done") {
-            const timeoutId = setTimeout(() => {
-                router.push("/login");
-            }, 2000);
-            return () => clearTimeout(timeoutId);
+    const onSubmitOtp = async (values: ResetPasswordFormData) => {
+        // Validate with Zod
+        const validationResult = await validateOtpForm(values);
+        if (!validationResult.success) {
+            return;
         }
-    }, [status, router]);
+
+        // Use auth service to complete password reset
+        const resetResult = await authService.completePasswordReset(
+            email,
+            values.otp,
+            generatedOtp,
+            "12345678" // In real app, this would be a generated secure password
+        );
+
+        if (!resetResult.success) {
+            setAlert({ type: "error", text: resetResult.error || "Password reset failed" });
+            return;
+        }
+
+        setStatus("done");
+        setAlert({ type: "success", text: "OTP verified successfully! Redirecting to login..." });
+        
+        // Auto redirect to login immediately
+        setTimeout(() => {
+            router.push("/login");
+        }, 1000); // 1 second delay to show success message
+    }
+
+    const handleSetNewPassword = async () => {
+        if (newPassword !== confirmPassword) {
+            setAlert({ type: "error", text: "Passwords do not match" });
+            return;
+        }
+
+        if (newPassword.length < 6) {
+            setAlert({ type: "error", text: "Password must be at least 6 characters" });
+            return;
+        }
+
+        try {
+            const resetResult = await authService.resetPassword(user?.id || "", newPassword);
+            if (resetResult.success) {
+                setShowPasswordModal(false);
+                setAlert({ type: "success", text: "Password has been updated successfully! You can now log in with your new password." });
+                setTimeout(() => {
+                    router.push("/login");
+                }, 2000);
+            } else {
+                setAlert({ type: "error", text: resetResult.error || "Failed to update password" });
+            }
+        } catch (error) {
+            setAlert({ type: "error", text: "An error occurred while updating password" });
+        }
+    }
+    
+    // Removed auto-redirect timeout - let user decide when to navigate
 
   return (
     <div className={styles.container}>
-      <div className={styles.header}>
-        <h1 className={styles.title}>Management Books System</h1>
-      </div>
+        <div className={styles.header}>
+          <h1 className={styles.title}>Management Books System</h1>
+        </div>
       <Card
         title={
           status === "enterEmail"
@@ -104,11 +174,18 @@ export default function ForgotPassword() {
         )}
 
         {status === "verifyOtp" && (
-          <Form form={oTpform} layout="vertical" onFinish={onSubmitOtp} autoComplete="off" className={styles.form}>
+          <Form form={otpForm} layout="vertical" onFinish={onSubmitOtp} autoComplete="off" className={styles.form}>
             <Form.Item label="Email" hidden>
               <Input value={email} disabled className={styles.input} />
             </Form.Item>
-            <Form.Item name="otp" label="OTP" rules={[{ required: true, message: "Please enter your OTP" }]}>
+            <Form.Item 
+              name="otp" 
+              label="OTP" 
+              rules={[
+                { required: true, message: "Please enter your OTP" },
+                { pattern: /^\d{6}$/, message: "OTP must be 6 digits" }
+              ]}
+            >
               <Input placeholder="Enter your OTP" maxLength={6} className={styles.input} />
             </Form.Item>
             <Form.Item>
@@ -121,9 +198,13 @@ export default function ForgotPassword() {
 
         {status === "done" && (
           <div>
-            <h3 className={styles.successMessage}>Password reset successful</h3>
-            <p className={styles.successText}>Your password has been reset to 12345678. Please log in with the new password.</p>
-            <p>Redirecting to login page...</p>
+            <h3 className={styles.successMessage}>OTP Verified Successfully!</h3>
+            <p className={styles.successText}>Your OTP has been verified. Redirecting to login page...</p>
+            <div className={styles.progressContainer}>
+              <div className={styles.progressBar}>
+                <div className={styles.progressFill}></div>
+              </div>
+            </div>
           </div>
         )}
 
@@ -133,6 +214,61 @@ export default function ForgotPassword() {
         </div>
       </Card>
 
+      {/* Password Reset Modal */}
+      <Modal
+        title="Set New Password"
+        open={showPasswordModal}
+        onCancel={() => setShowPasswordModal(false)}
+        footer={[
+          <Button key="cancel" onClick={() => setShowPasswordModal(false)}>
+            Cancel
+          </Button>,
+          <Button 
+            key="submit" 
+            type="primary" 
+            onClick={handleSetNewPassword}
+            className={styles.submitButton}
+          >
+            Update Password
+          </Button>
+        ]}
+        width={400}
+        centered
+      >
+        <div className={styles.modalContent}>
+          <p className={styles.modalDescription}>
+            Please enter your new password below:
+          </p>
+          
+          <Form layout="vertical">
+            <Form.Item label="New Password" required>
+              <Input.Password
+                placeholder="Enter new password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                className={styles.input}
+              />
+            </Form.Item>
+            
+            <Form.Item label="Confirm Password" required>
+              <Input.Password
+                placeholder="Confirm new password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                className={styles.input}
+              />
+            </Form.Item>
+          </Form>
+          
+          <div className={styles.passwordRequirements}>
+            <p>Password requirements:</p>
+            <ul>
+              <li>At least 6 characters long</li>
+              <li>Must match confirmation</li>
+            </ul>
+          </div>
+        </div>
+      </Modal>
     </div>  
   );
 }
