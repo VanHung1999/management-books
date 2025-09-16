@@ -7,15 +7,32 @@ import { getCategories } from "../lib/database/categoryBookService";
 import LoanModal from "../components/books/LoanModal";
 import { useLoanModal } from "../hooks/useLoanModal";
 import styles from "../styles/pages/books/Books.module.css";
+import { calculatePagination, getPaginationInfo, DEFAULT_PAGE_SIZES, PaginationData } from "../../utils/pagination";
+
+// Define enums for type safety
+enum SearchType {
+  NONE = "none",
+  NAME = "name",
+  AUTHOR = "author"
+}
+
+enum SortOrder {
+  ASC = "asc",
+  DESC = "desc"
+}
+
+enum CategoryFilter {
+  ALL = "all"
+}
 
 export default function Books() {
 
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
-  const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [selectedCategory, setSelectedCategory] = useState<string>(CategoryFilter.ALL);
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const [searchType, setSearchType] = useState<string>("none");
-  const [sortOrder, setSortOrder] = useState<string>("asc");
+  const [searchType, setSearchType] = useState<SearchType>(SearchType.NONE);
+  const [sortOrder, setSortOrder] = useState<SortOrder>(SortOrder.ASC);
   
   const categories = getCategories();
   const { data, isLoading } = useList({
@@ -36,13 +53,13 @@ export default function Books() {
 
   // Filter books by category and search query
   const filteredBooks = data?.data?.filter(book => {  
-    const matchesCategory = selectedCategory === "all" || book.category === selectedCategory;
+    const matchesCategory = selectedCategory === CategoryFilter.ALL || book.category === selectedCategory;
     
     let matchesSearch = true;
-    if (searchQuery !== "" && searchType !== "none") {
-      if (searchType === "name") {
+    if (searchQuery !== "" && searchType !== SearchType.NONE) {
+      if (searchType === SearchType.NAME) {
         matchesSearch = book.name.toLowerCase().includes(searchQuery.toLowerCase());
-      } else if (searchType === "author") {
+      } else if (searchType === SearchType.AUTHOR) {
         matchesSearch = book.author.toLowerCase().includes(searchQuery.toLowerCase());
       }
     }
@@ -52,19 +69,26 @@ export default function Books() {
 
   // Sort books by name alphabetically
   const sortedBooks = [...filteredBooks].sort((a, b) => {
-    if (sortOrder === "asc") {
+    if (sortOrder === SortOrder.ASC) {
       return a.name.localeCompare(b.name);
     } else {
       return b.name.localeCompare(a.name);
     }
   });
 
-  // Calculate pagination data
-  const totalBooks = sortedBooks.length;
-  const startIndex = (currentPage - 1) * pageSize;
-  const endIndex = startIndex + pageSize;
-  const currentBooks = sortedBooks.slice(startIndex, endIndex);
-  const totalPages = Math.ceil(totalBooks / pageSize);
+  // Calculate pagination data using utility function
+  const paginationData: PaginationData<any> = calculatePagination(sortedBooks, {
+    currentPage,
+    pageSize
+  });
+  
+  const { 
+    items: currentBooks, 
+    totalItems: totalBooks, 
+    totalPages,
+    hasNextPage,
+    hasPreviousPage 
+  } = paginationData;
 
   // Handle page change
   const handlePageChange = (page: number, size?: number) => {
@@ -88,20 +112,57 @@ export default function Books() {
   };
 
   // Handle search type change
-  const handleSearchTypeChange = (type: string) => {
+  const handleSearchTypeChange = (type: SearchType) => {
     setSearchType(type);
     setCurrentPage(1); // Reset to first page when changing search type
-    if (type === "none") {
+    if (type === SearchType.NONE) {
       setSearchQuery("");
     }
   };
 
   // Handle sort order change
-  const handleSortOrderChange = (order: string) => {
+  const handleSortOrderChange = (order: SortOrder) => {
     setSortOrder(order);
     setCurrentPage(1); // Reset to first page when changing sort order
   };
   
+  // Loading skeleton configuration
+  const skeletonTextConfigs = [
+    { className: styles.loadingCardTextSmall },
+    { className: styles.loadingCardTextMedium },
+    { className: styles.loadingCardTextLarge },
+    { className: styles.loadingCardTextXSmall },
+    { className: styles.loadingCardTextHalf },
+    { className: styles.loadingCardTextHalf2 },
+    { className: styles.loadingCardTextHalf3 }
+  ];
+
+  // Get search input placeholder based on search type
+  const getSearchPlaceholder = (searchType: SearchType): string => {
+    switch (searchType) {
+      case SearchType.NONE:
+        return "Search disabled";
+      case SearchType.NAME:
+        return "Search by book name...";
+      case SearchType.AUTHOR:
+        return "Search by author...";
+      default:
+        return "Search by book name or author...";
+    }
+  };
+
+  // Get search description text for display
+  const getSearchDescription = (searchType: SearchType): string => {
+    switch (searchType) {
+      case SearchType.NAME:
+        return "in name";
+      case SearchType.AUTHOR:
+        return "in author";
+      default:
+        return "in name/author";
+    }
+  };
+
   if (isLoading) {
     return (
       <div className={styles.loadingContainer}>
@@ -113,13 +174,14 @@ export default function Books() {
                 <Skeleton.Input active size="large" className={styles.loadingCardTitle} />
                 <Skeleton.Image active className={styles.loadingCardImage} />
                 <div className={styles.loadingCardContent}>
-                  <Skeleton.Input active size="small" className={styles.loadingCardTextSmall} />
-                  <Skeleton.Input active size="small" className={styles.loadingCardTextMedium} />
-                  <Skeleton.Input active size="small" className={styles.loadingCardTextLarge} />
-                  <Skeleton.Input active size="small" className={styles.loadingCardTextXSmall} />
-                  <Skeleton.Input active size="small" className={styles.loadingCardTextHalf} />
-                  <Skeleton.Input active size="small" className={styles.loadingCardTextHalf2} />
-                  <Skeleton.Input active size="small" className={styles.loadingCardTextHalf3} />
+                  {skeletonTextConfigs.map((config, configIndex) => (
+                    <Skeleton.Input 
+                      key={configIndex}
+                      active 
+                      size="small" 
+                      className={config.className} 
+                    />
+                  ))}
                 </div>
               </div>
             </Skeleton>
@@ -159,9 +221,9 @@ export default function Books() {
                 value={searchType}
                 onChange={handleSearchTypeChange}
                 options={[
-                  { value: "none", label: "🚫 No Search" },
-                  { value: "name", label: "📖 Search by Name" },
-                  { value: "author", label: "✍️ Search by Author" },
+                  { value: SearchType.NONE, label: "🚫 No Search" },
+                  { value: SearchType.NAME, label: "📖 Search by Name" },
+                  { value: SearchType.AUTHOR, label: "✍️ Search by Author" },
                 ]}
                 className={styles.fullWidthSelect}
                 placeholder="Select search type"
@@ -171,20 +233,15 @@ export default function Books() {
                 type="text"
                 value={searchQuery}
                 onChange={(e) => handleSearchChange(e.target.value)}
-                placeholder={
-                  searchType === "none" ? "Search disabled" :
-                  searchType === "name" ? "Search by book name..." :
-                  searchType === "author" ? "Search by author..." :
-                  "Search by book name or author..."
-                }
-                disabled={searchType === "none"}
+                placeholder={getSearchPlaceholder(searchType)}
+                disabled={searchType === SearchType.NONE}
                 className={styles.searchInput}
                 style={{
-                  opacity: searchType === "none" ? 0.6 : 1,
-                  backgroundColor: searchType === "none" ? '#f5f5f5' : 'white'
+                  opacity: searchType === SearchType.NONE ? 0.6 : 1,
+                  backgroundColor: searchType === SearchType.NONE ? '#f5f5f5' : 'white'
                 }}
                 onFocus={(e) => {
-                  if (searchType !== "none") {
+                  if (searchType !== SearchType.NONE) {
                     e.target.style.borderColor = '#52c41a';
                     e.target.style.boxShadow = '0 0 0 3px rgba(82, 196, 26, 0.1)';
                   }
@@ -210,8 +267,8 @@ export default function Books() {
               value={sortOrder}
               onChange={handleSortOrderChange}
               options={[
-                { value: "asc", label: "⬆️ A → Z (Ascending)" },
-                { value: "desc", label: "⬇️ Z → A (Descending)" }
+                { value: SortOrder.ASC, label: "⬆️ A → Z (Ascending)" },
+                { value: SortOrder.DESC, label: "⬇️ Z → A (Descending)" }
               ]}
               className={styles.sortSelect}
               placeholder="Select sort order"
@@ -232,7 +289,7 @@ export default function Books() {
               value={selectedCategory}
               onChange={handleCategoryChange}
               options={[
-                { value: "all", label: "🌐 All Categories" },
+                { value: CategoryFilter.ALL, label: "🌐 All Categories" },
                 ...categories.map(cat => ({ 
                   value: cat, 
                   label: `📚 ${cat}` 
@@ -250,18 +307,14 @@ export default function Books() {
           <div className={styles.paginationInfo}>
             <span className={styles.statsNumber}>📈</span>
             Total Books: <span className={styles.totalBooks}>{totalBooks}</span>
-            {selectedCategory !== "all" && (
+            {selectedCategory !== CategoryFilter.ALL && (
               <span className={styles.availableBooks}>
                 in <strong>{selectedCategory}</strong>
               </span>
             )}
-            {searchQuery !== "" && searchType !== "none" && (
+            {searchQuery !== "" && searchType !== SearchType.NONE && (
               <span className={styles.loanedBooks}>
-                matching "<strong>{searchQuery}</strong>" {
-                  searchType === "name" ? "in name" :
-                  searchType === "author" ? "in author" :
-                  "in name/author"
-                }
+                matching "<strong>{searchQuery}</strong>" {getSearchDescription(searchType)}
               </span>
             )}
           </div>
@@ -271,14 +324,7 @@ export default function Books() {
             <Select
               value={pageSize}
               onChange={(value) => handlePageChange(1, value)}
-              options={[
-                { value: 5, label: '5 items' },
-                { value: 10, label: '10 items' },
-                { value: 15, label: '15 items' },
-                { value: 20, label: '20 items' },
-                { value: 25, label: '25 items' },
-                { value: 30, label: '30 items' },
-              ]}
+              options={DEFAULT_PAGE_SIZES}
               className={styles.pageSizeSelect}
               size="small"
             />
@@ -396,7 +442,7 @@ export default function Books() {
               showSizeChanger={false}
               showQuickJumper
               showTotal={(total, range) => 
-                `${range[0]}-${range[1]} of ${total} items`
+                getPaginationInfo(paginationData)
               }
               onChange={handlePageChange}
               className={styles.paginationComponent}
