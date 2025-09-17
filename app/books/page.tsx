@@ -8,22 +8,8 @@ import LoanModal from "../components/books/LoanModal";
 import { useLoanModal } from "../hooks/useLoanModal";
 import styles from "../styles/pages/books/Books.module.css";
 import { calculatePagination, getPaginationInfo, DEFAULT_PAGE_SIZES, PaginationData } from "../../utils/pagination";
-
-// Define enums for type safety
-enum SearchType {
-  NONE = "none",
-  NAME = "name",
-  AUTHOR = "author"
-}
-
-enum SortOrder {
-  ASC = "asc",
-  DESC = "desc"
-}
-
-enum CategoryFilter {
-  ALL = "all"
-}
+import { sortArray, SortDirection } from "../../utils/sort";
+import { SearchType, CategoryFilter } from "../enums/book";
 
 export default function Books() {
 
@@ -32,7 +18,7 @@ export default function Books() {
   const [selectedCategory, setSelectedCategory] = useState<string>(CategoryFilter.ALL);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [searchType, setSearchType] = useState<SearchType>(SearchType.NONE);
-  const [sortOrder, setSortOrder] = useState<SortOrder>(SortOrder.ASC);
+  const [sortOrder, setSortOrder] = useState<SortDirection>(SortDirection.ASC);
   
   const categories = getCategories();
   const { data, isLoading } = useList({
@@ -67,14 +53,12 @@ export default function Books() {
     return matchesCategory && matchesSearch;
   }) || [];
 
-  // Sort books by name alphabetically
-  const sortedBooks = [...filteredBooks].sort((a, b) => {
-    if (sortOrder === SortOrder.ASC) {
-      return a.name.localeCompare(b.name);
-    } else {
-      return b.name.localeCompare(a.name);
-    }
-  });
+  // Sort books by name alphabetically using utility function
+  const sortedBooks = sortArray(
+    filteredBooks,
+    'name',
+    sortOrder
+  );
 
   // Calculate pagination data using utility function
   const paginationData: PaginationData<any> = calculatePagination(sortedBooks, {
@@ -121,7 +105,7 @@ export default function Books() {
   };
 
   // Handle sort order change
-  const handleSortOrderChange = (order: SortOrder) => {
+  const handleSortOrderChange = (order: SortDirection) => {
     setSortOrder(order);
     setCurrentPage(1); // Reset to first page when changing sort order
   };
@@ -139,28 +123,24 @@ export default function Books() {
 
   // Get search input placeholder based on search type
   const getSearchPlaceholder = (searchType: SearchType): string => {
-    switch (searchType) {
-      case SearchType.NONE:
-        return "Search disabled";
-      case SearchType.NAME:
-        return "Search by book name...";
-      case SearchType.AUTHOR:
-        return "Search by author...";
-      default:
-        return "Search by book name or author...";
-    }
+    const placeholders: Record<SearchType, string> = {
+      [SearchType.NONE]: "Search disabled",
+      [SearchType.NAME]: "Search by book name...",
+      [SearchType.AUTHOR]: "Search by author...",
+    };
+
+    return placeholders[searchType] ?? "Search by book name or author...";
   };
 
   // Get search description text for display
   const getSearchDescription = (searchType: SearchType): string => {
-    switch (searchType) {
-      case SearchType.NAME:
-        return "in name";
-      case SearchType.AUTHOR:
-        return "in author";
-      default:
-        return "in name/author";
-    }
+    const descriptions: Record<SearchType, string> = {
+      [SearchType.NONE]: "in name/author",
+      [SearchType.NAME]: "in name",
+      [SearchType.AUTHOR]: "in author",
+    };
+
+    return descriptions[searchType] ?? "in name/author";
   };
 
   if (isLoading) {
@@ -267,8 +247,8 @@ export default function Books() {
               value={sortOrder}
               onChange={handleSortOrderChange}
               options={[
-                { value: SortOrder.ASC, label: "⬆️ A → Z (Ascending)" },
-                { value: SortOrder.DESC, label: "⬇️ Z → A (Descending)" }
+                { value: SortDirection.ASC, label: "⬆️ A → Z (Ascending)" },
+                { value: SortDirection.DESC, label: "⬇️ Z → A (Descending)" }
               ]}
               className={styles.sortSelect}
               placeholder="Select sort order"
