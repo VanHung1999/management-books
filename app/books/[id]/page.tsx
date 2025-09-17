@@ -2,12 +2,15 @@
 
 import { useOne } from "@refinedev/core";
 import { useParams } from "next/navigation";
-import { Card, Row, Col, Tag, Divider, Skeleton, Button, Space, Typography, Badge, Avatar, } from "antd";
+import { Card, Row, Col, Tag, Skeleton, Button, Space, Typography, Badge, Avatar, } from "antd";
 import { ArrowLeftOutlined, BookOutlined, UserOutlined, CalendarOutlined, TagOutlined, BarcodeOutlined, FileTextOutlined, ClockCircleOutlined, EditOutlined, HomeOutlined } from '@ant-design/icons';
 import Link from "next/link";
 import LoanModal from "../../components/books/LoanModal";
+import StatusCard from "../../components/books/StatusCard";
+import InfoCard from "../../components/books/InfoCard";
 import { Book } from "../../types/book";
 import { useLoanModal } from "../../hooks/useLoanModal";
+import { formatDateLong } from "../../utils/date";
 import styles from "../../styles/pages/books/detail/DetailBook.module.css";
 
 const { Title, Text, Paragraph } = Typography;
@@ -149,140 +152,74 @@ export default function BookDetail() {
             </Title>
             <Row gutter={[20, 20]}>
               <Col xs={12} sm={6}>
-                <Card 
-                  size="small" 
-                  className={`${styles.statusCard} ${styles.statusCardAvailable}`}
-                >
-                  <div className={`${styles.statusNumber} ${styles.statusNumberAvailable}`}>
-                    {book.status.available}
-                  </div>
-                  <Text className={`${styles.statusLabel} ${styles.statusLabelAvailable}`}>Available</Text>
-                </Card>
+                <StatusCard
+                  value={book.status.available}
+                  label="Available"
+                  type="available"
+                  styles={styles}
+                />
               </Col>
               <Col xs={12} sm={6}>
-                <Card 
-                  size="small" 
-                  className={`${styles.statusCard} ${styles.statusCardLoaned}`}
-                >
-                  <div className={`${styles.statusNumber} ${styles.statusNumberLoaned}`}>
-                    {book.status.loaned}
-                  </div>
-                  <Text className={`${styles.statusLabel} ${styles.statusLabelLoaned}`}>Loaned</Text>
-                </Card>
+                <StatusCard
+                  value={book.status.loaned}
+                  label="Loaned"
+                  type="loaned"
+                  styles={styles}
+                />
               </Col>
               <Col xs={12} sm={6}>
-                <Card 
-                  size="small" 
-                  className={`${styles.statusCard} ${styles.statusCardDisabled}`}
-                >
-                  <div className={`${styles.statusNumber} ${styles.statusNumberDisabled}`}>
-                    {book.status.disabled}
-                  </div>
-                  <Text className={`${styles.statusLabel} ${styles.statusLabelDisabled}`}>Disabled</Text>
-                </Card>
+                <StatusCard
+                  value={book.status.disabled}
+                  label="Disabled"
+                  type="disabled"
+                  styles={styles}
+                />
               </Col>
               <Col xs={12} sm={6}>
-                <Card 
-                  size="small" 
-                  className={`${styles.statusCard} ${styles.statusCardRenovated}`}
-                >
-                  <div className={`${styles.statusNumber} ${styles.statusNumberRenovated}`}>
-                    {book.status.renovated}
-                  </div>
-                  <Text className={`${styles.statusLabel} ${styles.statusLabelRenovated}`}>Renovated</Text>
-                </Card>
+                <StatusCard
+                  value={book.status.renovated}
+                  label="Renovated"
+                  type="renovated"
+                  styles={styles}
+                />
               </Col>
             </Row>
           </div>
         </Card>
 
         {/* Additional Information */}
-        <Card 
-          title={
-            <div className={styles.cardTitle}>
-              <Avatar 
-                icon={<BookOutlined />} 
-                className={styles.cardTitleIcon}
-              />
-              Book Information
-            </div>
-          }
-          className={styles.additionalInfoCard}
-          styles={{ body: { padding: '32px' } }}
-        >
-          <Row gutter={[32, 24]}>
-            <Col xs={24} sm={12}>
-              <div className={styles.infoItem}>
-                <Avatar 
-                  icon={<BarcodeOutlined />} 
-                  className={`${styles.infoItemIcon} ${styles.infoItemIconPrimary}`}
-                />
-                <div>
-                  <Text strong className={styles.infoItemLabel}>ISBN</Text>
-                  <br />
-                  <Text className={styles.infoItemValue}>{book.ISBN || 'N/A'}</Text>
-                </div>
-              </div>
-            </Col>
-            <Col xs={24} sm={12}>
-              <div className={styles.infoItem}>
-                <Avatar 
-                  icon={<FileTextOutlined />} 
-                  className={`${styles.infoItemIcon} ${styles.infoItemIconSuccess}`}
-                />
-                <div>
-                  <Text strong className={styles.infoItemLabel}>Total Copies</Text>
-                  <br />
-                  <Text className={styles.infoItemValue}>{book.num}</Text>
-                </div>
-              </div>
-            </Col>
-          </Row>
-
-          <Divider className={styles.divider} />
-
-          {/* Timestamps */}
-          <Row gutter={[32, 24]}>
-            <Col xs={24} sm={12}>
-              <div className={styles.infoItem}>
-                <Avatar 
-                  icon={<ClockCircleOutlined />} 
-                  className={`${styles.infoItemIcon} ${styles.infoItemIconPrimary}`}
-                />
-                <div>
-                  <Text strong className={styles.infoItemLabel}>Created</Text>
-                  <br />
-                  <Text className={styles.infoItemValue}>
-                    {new Date(book.createdAt).toLocaleDateString('en-US', {
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric'
-                    })}
-                  </Text>
-                </div>
-              </div>
-            </Col>
-            <Col xs={24} sm={12}>
-              <div className={styles.infoItem}>
-                <Avatar 
-                  icon={<ClockCircleOutlined />} 
-                  className={`${styles.infoItemIcon} ${styles.infoItemIconPrimary}`}
-                />
-                <div>
-                  <Text strong className={styles.infoItemLabel}>Last Updated</Text>
-                  <br />
-                  <Text className={styles.infoItemValue}>
-                    {new Date(book.updatedAt).toLocaleDateString('en-US', {
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric'
-                    })}
-                  </Text>
-                </div>
-              </div>
-            </Col>
-          </Row>
-        </Card>
+        <InfoCard
+          title="Book Information"
+          titleIcon={<BookOutlined />}
+          items={[
+            {
+              icon: <BarcodeOutlined />,
+              label: 'ISBN',
+              value: book.ISBN || 'N/A',
+              iconType: 'primary'
+            },
+            {
+              icon: <FileTextOutlined />,
+              label: 'Total Copies',
+              value: book.num,
+              iconType: 'success'
+            },
+            {
+              icon: <ClockCircleOutlined />,
+              label: 'Created',
+              value: formatDateLong(book.createdAt),
+              iconType: 'primary'
+            },
+            {
+              icon: <ClockCircleOutlined />,
+              label: 'Last Updated',
+              value: formatDateLong(book.updatedAt),
+              iconType: 'primary'
+            }
+          ]}
+          styles={styles}
+          bodyPadding="32px"
+        />
 
         {/* Action Buttons */}
         <div className={styles.actionSection}>

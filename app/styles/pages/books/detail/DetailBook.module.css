@@ -1,11 +1,12 @@
 /* Detail Book Page Styles */
+@import '../../theme/colors.css';
 
 /* Loading Container */
 .loadingContainer {
-  padding: 32px;
+  padding: var(--ant-padding-xl);
   max-width: 1400px;
   margin: 0 auto;
-  background-color: #fafafa;
+  background-color: var(--ant-bg-color-layout);
   min-height: 100vh;
 }
 
@@ -15,66 +16,66 @@
 
 /* Error Container */
 .errorContainer {
-  padding: 48px;
+  padding: var(--ant-padding-xxl);
   text-align: center;
   max-width: 1400px;
   margin: 0 auto;
-  background-color: #fafafa;
+  background-color: var(--ant-bg-color-layout);
   min-height: 100vh;
 }
 
 .errorIcon {
   font-size: 64px;
-  color: #d9d9d9;
-  margin-bottom: 16px;
+  color: var(--ant-text-color-disabled);
+  margin-bottom: var(--ant-margin-md);
 }
 
 .errorTitle {
-  color: #8c8c8c;
-  margin: 16px 0;
+  color: var(--ant-text-color-secondary);
+  margin: var(--ant-margin-md) 0;
 }
 
 .errorText {
-  color: #8c8c8c;
+  color: var(--ant-text-color-secondary);
   font-size: 16px;
 }
 
 .errorButton {
-  margin-top: 16px;
+  margin-top: var(--ant-margin-md);
 }
 
 /* Main Container */
 .mainContainer {
-    background-color: #fafafa;
+    background-color: var(--ant-bg-color-layout);
     min-height: 100vh;
     padding: 0;
   }
 
 /* Header Section */
 .headerSection {
-  background-color: white;
-  border-bottom: 1px solid #f0f0f0;
-  padding: 24px 0;
-  margin-bottom: 32px;
+  background-color: var(--ant-bg-color-container);
+  border-bottom: 1px solid var(--ant-border-color-split);
+  padding: var(--ant-padding-lg) 0;
+  margin-bottom: var(--ant-margin-xl);
 }
 
 .headerContent {
   max-width: 1400px;
   margin: 0 auto;
-  padding: 0 32px;
+  padding: 0 var(--ant-padding-xl);
 }
 
 .backButton {
   font-size: 16px;
   height: auto;
   padding: 12px 20px;
-  color: #1890ff;
-  border-radius: 8px;
+  color: var(--ant-primary-color);
+  border-radius: var(--ant-border-radius-lg);
   transition: all 0.3s ease;
 }
 
 .backButton:hover {
-  background-color: rgba(24, 144, 255, 0.1) !important;
+  background-color: var(--ant-primary-1) !important;
   transform: translateX(-4px);
 }
 
@@ -82,14 +83,14 @@
 .mainContent {
   max-width: 1400px;
   margin: 0 auto;
-  padding: 0 32px 32px 32px;
+  padding: 0 var(--ant-padding-xl) var(--ant-padding-xl) var(--ant-padding-xl);
 }
 
 /* Main Book Card */
 .mainBookCard {
   border-radius: 20px;
   box-shadow: 0 8px 32px rgba(0,0,0,0.08);
-  margin-bottom: 32px;
+  margin-bottom: var(--ant-margin-xl);
   border: none;
   overflow: hidden;
 }
@@ -241,27 +242,27 @@
 }
 
 .statusCardAvailable {
-  background-color: #f6ffed;
-  border-color: #b7eb8f;
-  box-shadow: 0 4px 12px rgba(82, 196, 26, 0.15);
+  background-color: var(--ant-success-1);
+  border-color: var(--ant-success-3);
+  box-shadow: 0 4px 12px var(--ant-success-color-outline);
 }
 
 .statusCardLoaned {
-  background-color: #fff7e6;
-  border-color: #ffd591;
-  box-shadow: 0 4px 12px rgba(255, 213, 145, 0.15);
+  background-color: var(--ant-warning-1);
+  border-color: var(--ant-warning-3);
+  box-shadow: 0 4px 12px var(--ant-warning-color-outline);
 }
 
 .statusCardDisabled {
-  background-color: #fff2f0;
-  border-color: #ffccc7;
-  box-shadow: 0 4px 12px rgba(255, 204, 203, 0.15);
+  background-color: var(--ant-error-1);
+  border-color: var(--ant-error-3);
+  box-shadow: 0 4px 12px var(--ant-error-color-outline);
 }
 
 .statusCardRenovated {
-  background-color: #f0f8ff;
-  border-color: #91d5ff;
-  box-shadow: 0 4px 12px rgba(145, 213, 255, 0.15);
+  background-color: var(--ant-primary-1);
+  border-color: var(--ant-primary-3);
+  box-shadow: 0 4px 12px var(--ant-primary-color-outline);
 }
 
 .statusNumber {
@@ -271,19 +272,19 @@
 }
 
 .statusNumberAvailable {
-  color: #52c41a;
+  color: var(--ant-success-color);
 }
 
 .statusNumberLoaned {
-  color: #fa8c16;
+  color: var(--ant-warning-color);
 }
 
 .statusNumberDisabled {
-  color: #ff4d4f;
+  color: var(--ant-error-color);
 }
 
 .statusNumberRenovated {
-  color: #1890ff;
+  color: var(--ant-primary-color);
 }
 
 .statusLabel {
@@ -292,19 +293,19 @@
 }
 
 .statusLabelAvailable {
-  color: #52c41a;
+  color: var(--ant-success-color);
 }
 
 .statusLabelLoaned {
-  color: #fa8c16;
+  color: var(--ant-warning-color);
 }
 
 .statusLabelDisabled {
-  color: #ff4d4f;
+  color: var(--ant-error-color);
 }
 
 .statusLabelRenovated {
-  color: #1890ff;
+  color: var(--ant-primary-color);
 }
 
 /* Additional Information Card */
@@ -329,25 +330,25 @@
 }
 
 .cardTitleIcon {
-  background-color: #1890ff;
-  color: white;
+  background-color: var(--ant-primary-color);
+  color: var(--ant-text-color-inverse);
 }
 
 .infoItem {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: var(--ant-margin-md);
   padding: 20px;
-  background-color: #f8f9fa;
-  border-radius: 12px;
-  border: 1px solid #e9ecef;
+  background-color: var(--ant-fill-color-secondary);
+  border-radius: var(--ant-border-radius-lg);
+  border: 1px solid var(--ant-border-color-split);
   transition: all 0.3s ease;
 }
 
 .infoItem:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 16px rgba(0,0,0,0.1);
-  border-color: #1890ff;
+  border-color: var(--ant-primary-color);
 }
 
 .infoItemIcon {
@@ -355,23 +356,23 @@
 }
 
 .infoItemIconPrimary {
-  background-color: #1890ff;
-  color: white;
+  background-color: var(--ant-primary-color);
+  color: var(--ant-text-color-inverse);
 }
 
 .infoItemIconSuccess {
-  background-color: #52c41a;
-  color: white;
+  background-color: var(--ant-success-color);
+  color: var(--ant-text-color-inverse);
 }
 
 .infoItemLabel {
   font-size: 14px;
-  color: #8c8c8c;
+  color: var(--ant-text-color-secondary);
 }
 
 .infoItemValue {
   font-size: 16px;
-  color: #1f1f1f;
+  color: var(--ant-text-color);
 }
 
 .divider {
@@ -382,7 +383,7 @@
 .actionSection {
   text-align: center;
   padding: 40px;
-  background-color: white;
+  background-color: var(--ant-bg-color-container);
   border-radius: 20px;
   box-shadow: 0 8px 32px rgba(0,0,0,0.08);
 }
@@ -409,29 +410,29 @@
 }
 
 .loanButton {
-  background: linear-gradient(135deg, #1890ff 0%, #096dd9 100%);
+  background: linear-gradient(135deg, var(--ant-primary-color) 0%, var(--ant-primary-color-active) 100%);
   border: none;
-  box-shadow: 0 4px 12px rgba(82, 196, 26, 0.3);
+  box-shadow: 0 4px 12px var(--ant-success-color-outline);
 }
 
 .loanButtonDisabled {
-  background: #d9d9d9;
+  background: var(--ant-text-color-disabled);
   border: none;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .editButton {
-  box-shadow: 0 4px 12px rgba(24, 144, 255, 0.3);
+  box-shadow: 0 4px 12px var(--ant-primary-color-outline);
 }
 
 .backToListButton {
-  border: 2px solid #d9d9d9;
+  border: 2px solid var(--ant-border-color);
 }
 
 /* Responsive Design */
 @media (max-width: 768px) {
   .mainContent {
-    padding: 0 16px 16px 16px;
+    padding: 0 var(--ant-padding-md) var(--ant-padding-md) var(--ant-padding-md);
   }
   
   .bookHeader {
@@ -443,15 +444,15 @@
   }
   
   .bookStatusSection {
-    padding: 24px;
+    padding: var(--ant-padding-lg);
   }
   
   .additionalInfoCardBody {
-    padding: 24px;
+    padding: var(--ant-padding-lg);
   }
   
   .actionSection {
-    padding: 24px;
+    padding: var(--ant-padding-lg);
   }
   
   .actionButton {
