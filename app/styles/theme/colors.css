@@ -1,0 +1,124 @@
+/**
+ * Ant Design Color Variables
+ * Import Ant Design CSS and use their built-in variables
+ */
+
+@import 'antd/dist/reset.css';
+
+:root {
+  /* Use Ant Design's built-in CSS variables directly */
+  /* These are available after importing antd/dist/reset.css */
+  
+  /* Primary Colors - using Ant Design variables */
+  --ant-primary-color: var(--ant-color-primary);
+  --ant-primary-color-hover: var(--ant-color-primary-hover);
+  --ant-primary-color-active: var(--ant-color-primary-active);
+  --ant-primary-color-outline: var(--ant-color-primary-outline);
+  --ant-primary-1: var(--ant-color-primary-bg);
+  --ant-primary-2: var(--ant-color-primary-bg-hover);
+  --ant-primary-3: var(--ant-color-primary-border);
+  --ant-primary-4: var(--ant-color-primary-border-hover);
+  --ant-primary-5: var(--ant-color-primary-hover);
+  --ant-primary-6: var(--ant-color-primary);
+  --ant-primary-7: var(--ant-color-primary-active);
+  --ant-primary-8: var(--ant-color-primary-text);
+  --ant-primary-9: var(--ant-color-primary-text-hover);
+  --ant-primary-10: var(--ant-color-primary-text-active);
+
+  /* Success Colors */
+  --ant-success-color: var(--ant-color-success);
+  --ant-success-color-hover: var(--ant-color-success-hover);
+  --ant-success-color-active: var(--ant-color-success-active);
+  --ant-success-color-outline: var(--ant-color-success-outline);
+  --ant-success-1: var(--ant-color-success-bg);
+  --ant-success-2: var(--ant-color-success-bg-hover);
+  --ant-success-3: var(--ant-color-success-border);
+  --ant-success-4: var(--ant-color-success-border-hover);
+  --ant-success-5: var(--ant-color-success-hover);
+  --ant-success-6: var(--ant-color-success);
+  --ant-success-7: var(--ant-color-success-active);
+  --ant-success-8: var(--ant-color-success-text);
+  --ant-success-9: var(--ant-color-success-text-hover);
+  --ant-success-10: var(--ant-color-success-text-active);
+
+  /* Warning Colors */
+  --ant-warning-color: var(--ant-color-warning);
+  --ant-warning-color-hover: var(--ant-color-warning-hover);
+  --ant-warning-color-active: var(--ant-color-warning-active);
+  --ant-warning-color-outline: var(--ant-color-warning-outline);
+  --ant-warning-1: var(--ant-color-warning-bg);
+  --ant-warning-2: var(--ant-color-warning-bg-hover);
+  --ant-warning-3: var(--ant-color-warning-border);
+  --ant-warning-4: var(--ant-color-warning-border-hover);
+  --ant-warning-5: var(--ant-color-warning-hover);
+  --ant-warning-6: var(--ant-color-warning);
+  --ant-warning-7: var(--ant-color-warning-active);
+  --ant-warning-8: var(--ant-color-warning-text);
+  --ant-warning-9: var(--ant-color-warning-text-hover);
+  --ant-warning-10: var(--ant-color-warning-text-active);
+
+  /* Error Colors */
+  --ant-error-color: var(--ant-color-error);
+  --ant-error-color-hover: var(--ant-color-error-hover);
+  --ant-error-color-active: var(--ant-color-error-active);
+  --ant-error-color-outline: var(--ant-color-error-outline);
+  --ant-error-1: var(--ant-color-error-bg);
+  --ant-error-2: var(--ant-color-error-bg-hover);
+  --ant-error-3: var(--ant-color-error-border);
+  --ant-error-4: var(--ant-color-error-border-hover);
+  --ant-error-5: var(--ant-color-error-hover);
+  --ant-error-6: var(--ant-color-error);
+  --ant-error-7: var(--ant-color-error-active);
+  --ant-error-8: var(--ant-color-error-text);
+  --ant-error-9: var(--ant-color-error-text-hover);
+  --ant-error-10: var(--ant-color-error-text-active);
+
+  /* Text Colors */
+  --ant-text-color: var(--ant-color-text);
+  --ant-text-color-secondary: var(--ant-color-text-secondary);
+  --ant-text-color-tertiary: var(--ant-color-text-tertiary);
+  --ant-text-color-quaternary: var(--ant-color-text-quaternary);
+  --ant-text-color-disabled: var(--ant-color-text-disabled);
+  --ant-text-color-inverse: var(--ant-color-white);
+  --ant-text-color-hint: var(--ant-color-text-quaternary);
+
+  /* Background Colors */
+  --ant-bg-color: var(--ant-color-bg-container);
+  --ant-bg-color-container: var(--ant-color-bg-container);
+  --ant-bg-color-elevated: var(--ant-color-bg-elevated);
+  --ant-bg-color-layout: var(--ant-color-bg-layout);
+  --ant-bg-color-spotlight: var(--ant-color-bg-spotlight);
+  --ant-bg-color-mask: var(--ant-color-bg-mask);
+
+  /* Border Colors */
+  --ant-border-color: var(--ant-color-border);
+  --ant-border-color-split: var(--ant-color-border-secondary);
+  --ant-border-color-inverse: var(--ant-color-white);
+
+  /* Fill Colors */
+  --ant-fill-color: var(--ant-color-fill);
+  --ant-fill-color-secondary: var(--ant-color-fill-secondary);
+  --ant-fill-color-tertiary: var(--ant-color-fill-tertiary);
+  --ant-fill-color-quaternary: var(--ant-color-fill-quaternary);
+
+  /* Spacing - using Ant Design spacing tokens */
+  --ant-margin-xs: var(--ant-margin-xs);
+  --ant-margin-sm: var(--ant-margin-sm);
+  --ant-margin-md: var(--ant-margin-md);
+  --ant-margin-lg: var(--ant-margin-lg);
+  --ant-margin-xl: var(--ant-margin-xl);
+  --ant-margin-xxl: var(--ant-margin-xxl);
+
+  --ant-padding-xs: var(--ant-padding-xs);
+  --ant-padding-sm: var(--ant-padding-sm);
+  --ant-padding-md: var(--ant-padding-md);
+  --ant-padding-lg: var(--ant-padding-lg);
+  --ant-padding-xl: var(--ant-padding-xl);
+  --ant-padding-xxl: var(--ant-padding-xxl);
+
+  /* Border Radius */
+  --ant-border-radius: var(--ant-border-radius);
+  --ant-border-radius-sm: var(--ant-border-radius-sm);
+  --ant-border-radius-lg: var(--ant-border-radius-lg);
+  --ant-border-radius-xl: var(--ant-border-radius-lg);
+}
