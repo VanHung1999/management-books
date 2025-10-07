@@ -1,0 +1,162 @@
+/**
+ * Ant Design Color Variables
+ * Import Ant Design CSS and use their built-in variables
+ */
+
+ @import 'antd/dist/reset.css';
+
+:root,
+[data-theme="light"] {
+  /* Ant Design variables are available after the reset import. */
+
+  /* Ant primary tokens */
+  --ant-primary-color: var(--ant-color-primary);
+  --ant-primary-color-hover: var(--ant-color-primary-hover);
+  --ant-primary-color-active: var(--ant-color-primary-active);
+  --ant-primary-color-outline: var(--ant-color-primary-outline);
+  --ant-primary-1: var(--ant-color-primary-bg);
+  --ant-primary-2: var(--ant-color-primary-bg-hover);
+  --ant-primary-3: var(--ant-color-primary-border);
+  --ant-primary-4: var(--ant-color-primary-border-hover);
+  --ant-primary-5: var(--ant-color-primary-hover);
+  --ant-primary-6: var(--ant-color-primary);
+  --ant-primary-7: var(--ant-color-primary-active);
+  --ant-primary-8: var(--ant-color-primary-text);
+  --ant-primary-9: var(--ant-color-primary-text-hover);
+  --ant-primary-10: var(--ant-color-primary-text-active);
+
+  /* Ant success tokens */
+  --ant-success-color: var(--ant-color-success);
+  --ant-success-color-hover: var(--ant-color-success-hover);
+  --ant-success-color-active: var(--ant-color-success-active);
+  --ant-success-color-outline: var(--ant-color-success-outline);
+  --ant-success-1: var(--ant-color-success-bg);
+  --ant-success-2: var(--ant-color-success-bg-hover);
+  --ant-success-3: var(--ant-color-success-border);
+  --ant-success-4: var(--ant-color-success-border-hover);
+  --ant-success-5: var(--ant-color-success-hover);
+  --ant-success-6: var(--ant-color-success);
+  --ant-success-7: var(--ant-color-success-active);
+  --ant-success-8: var(--ant-color-success-text);
+  --ant-success-9: var(--ant-color-success-text-hover);
+  --ant-success-10: var(--ant-color-success-text-active);
+
+  /* Ant warning tokens */
+  --ant-warning-color: var(--ant-color-warning);
+  --ant-warning-color-hover: var(--ant-color-warning-hover);
+  --ant-warning-color-active: var(--ant-color-warning-active);
+  --ant-warning-color-outline: var(--ant-color-warning-outline);
+  --ant-warning-1: var(--ant-color-warning-bg);
+  --ant-warning-2: var(--ant-color-warning-bg-hover);
+  --ant-warning-3: var(--ant-color-warning-border);
+  --ant-warning-4: var(--ant-color-warning-border-hover);
+  --ant-warning-5: var(--ant-color-warning-hover);
+  --ant-warning-6: var(--ant-color-warning);
+  --ant-warning-7: var(--ant-color-warning-active);
+  --ant-warning-8: var(--ant-color-warning-text);
+  --ant-warning-9: var(--ant-color-warning-text-hover);
+  --ant-warning-10: var(--ant-color-warning-text-active);
+
+  /* Ant error tokens */
+  --ant-error-color: var(--ant-color-error);
+  --ant-error-color-hover: var(--ant-color-error-hover);
+  --ant-error-color-active: var(--ant-color-error-active);
+  --ant-error-color-outline: var(--ant-color-error-outline);
+  --ant-error-1: var(--ant-color-error-bg);
+  --ant-error-2: var(--ant-color-error-bg-hover);
+  --ant-error-3: var(--ant-color-error-border);
+  --ant-error-4: var(--ant-color-error-border-hover);
+  --ant-error-5: var(--ant-color-error-hover);
+  --ant-error-6: var(--ant-color-error);
+  --ant-error-7: var(--ant-color-error-active);
+  --ant-error-8: var(--ant-color-error-text);
+  --ant-error-9: var(--ant-color-error-text-hover);
+  --ant-error-10: var(--ant-color-error-text-active);
+
+  /* Ant text tokens */
+  --ant-text-color: var(--ant-color-text);
+  --ant-text-color-secondary: var(--ant-color-text-secondary);
+  --ant-text-color-tertiary: var(--ant-color-text-tertiary);
+  --ant-text-color-quaternary: var(--ant-color-text-quaternary);
+  --ant-text-color-disabled: var(--ant-color-text-disabled);
+  --ant-text-color-inverse: var(--ant-color-white);
+  --ant-text-color-hint: var(--ant-color-text-quaternary);
+
+  /* Ant background tokens */
+  --ant-bg-color: var(--ant-color-bg-container);
+  --ant-bg-color-container: var(--ant-color-bg-container);
+  --ant-bg-color-elevated: var(--ant-color-bg-elevated);
+  --ant-bg-color-layout: var(--ant-color-bg-layout);
+  --ant-bg-color-spotlight: var(--ant-color-bg-spotlight);
+  --ant-bg-color-mask: var(--ant-color-bg-mask);
+
+  /* Ant border tokens */
+  --ant-border-color: var(--ant-color-border);
+  --ant-border-color-split: var(--ant-color-border-secondary);
+  --ant-border-color-inverse: var(--ant-color-white);
+
+  /* Ant fill tokens */
+  --ant-fill-color: var(--ant-color-fill);
+  --ant-fill-color-secondary: var(--ant-color-fill-secondary);
+  --ant-fill-color-tertiary: var(--ant-color-fill-tertiary);
+  --ant-fill-color-quaternary: var(--ant-color-fill-quaternary);
+
+  /* Semantic app tokens mapped to Ant Design */
+  --color-primary: var(--ant-color-primary);
+  --color-primary-hover: var(--ant-color-primary-hover);
+  --color-success: var(--ant-color-success);
+  --color-warning: var(--ant-color-warning);
+  --color-error: var(--ant-color-error);
+
+  --text-color: var(--ant-color-text);
+  --text-color-secondary: var(--ant-color-text-secondary);
+  --text-color-inverse: var(--ant-color-white);
+
+  --bg-container: var(--ant-color-bg-container);
+  --bg-elevated: var(--ant-color-bg-elevated);
+  --bg-layout: var(--ant-color-bg-layout);
+
+  --border-color: var(--ant-color-border);
+  --border-color-secondary: var(--ant-color-border-secondary);
+
+  --fill-color: var(--ant-color-fill);
+  --fill-color-secondary: var(--ant-color-fill-secondary);
+
+  /* Spacing */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --spacing-xxl: 48px;
+
+  /* Radius */
+  --radius-sm: 4px;
+  --radius-md: var(--ant-border-radius);
+  --radius-lg: 8px;
+}
+
+/* Dark theme scope. Ant Design switches underlying --ant-color-* values
+   when using its dark algorithm, so we only need to remap semantic tokens
+   if we want different aliases. Keeping the same mapping ensures sync. */
+[data-theme="dark"] {
+  --color-primary: var(--ant-color-primary);
+  --color-primary-hover: var(--ant-color-primary-hover);
+  --color-success: var(--ant-color-success);
+  --color-warning: var(--ant-color-warning);
+  --color-error: var(--ant-color-error);
+
+  --text-color: var(--ant-color-text);
+  --text-color-secondary: var(--ant-color-text-secondary);
+  --text-color-inverse: var(--ant-color-white);
+
+  --bg-container: var(--ant-color-bg-container);
+  --bg-elevated: var(--ant-color-bg-elevated);
+  --bg-layout: var(--ant-color-bg-layout);
+
+  --border-color: var(--ant-color-border);
+  --border-color-secondary: var(--ant-color-border-secondary);
+
+  --fill-color: var(--ant-color-fill);
+  --fill-color-secondary: var(--ant-color-fill-secondary);
+}
