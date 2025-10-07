@@ -2,7 +2,7 @@
 
 /* Main Container */
 .mainContainer {
-  background-color: #fafafa;
+  background-color: var(--bg-layout);
   min-height: 100vh;
   padding: 0;
 }
@@ -12,7 +12,7 @@
   padding: 32px;
   max-width: 1000px;
   margin: 0 auto;
-  background-color: #fafafa;
+  background-color: var(--bg-layout);
   min-height: 100vh;
 }
 
@@ -22,11 +22,11 @@
 
 .loadingIcon {
   font-size: 48px;
-  color: #d9d9d9;
+  color: var(--fill-color-secondary);
 }
 
 .loadingTitle {
-  color: #8c8c8c;
+  color: var(--text-color-secondary);
   margin: 16px 0;
 }
 
@@ -35,7 +35,7 @@
   padding: 32px;
   max-width: 1000px;
   margin: 0 auto;
-  background-color: #fafafa;
+  background-color: var(--bg-layout);
   min-height: 100vh;
 }
 
@@ -45,11 +45,11 @@
 
 .errorIcon {
   font-size: 48px;
-  color: #d9d9d9;
+  color: var(--fill-color-secondary);
 }
 
 .errorTitle {
-  color: #8c8c8c;
+  color: var(--text-color-secondary);
   margin: 16px 0;
 }
 
@@ -59,8 +59,8 @@
 
 /* Header Section */
 .headerSection {
-  background-color: white;
-  border-bottom: 1px solid #f0f0f0;
+  background-color: var(--bg-container);
+  border-bottom: 1px solid var(--border-color-secondary);
   padding: 24px 0;
   margin-bottom: 32px;
 }
@@ -75,13 +75,13 @@
   font-size: 16px;
   height: auto;
   padding: 12px 20px;
-  color: #1890ff;
+  color: var(--color-primary);
   border-radius: 8px;
   transition: all 0.3s ease;
 }
 
 .backButton:hover {
-  background-color: rgba(24, 144, 255, 0.1) !important;
+  background-color: var(--ant-primary-1) !important;
   transform: translateX(-4px);
 }
 
@@ -109,16 +109,16 @@
 
 .bookInfoIcon {
   font-size: 24px;
-  color: #1890ff;
+  color: var(--color-primary);
 }
 
 .bookInfoTitle {
   margin: 0 0 8px 0;
-  color: #1f1f1f;
+  color: var(--text-color);
 }
 
 .bookInfoSubtitle {
-  color: #8c8c8c;
+  color: var(--text-color-secondary);
 }
 
 /* Status Management Card */
@@ -135,11 +135,11 @@
   gap: 12px;
   font-size: 18px;
   font-weight: 600;
-  color: #1f1f1f;
+  color: var(--text-color);
 }
 
 .cardTitleIcon {
-  color: #1890ff;
+  color: var(--color-primary);
 }
 
 .statusInfo {
@@ -148,14 +148,14 @@
 
 .statusInfoText {
   font-size: 16px;
-  color: #1f1f1f;
+  color: var(--text-color);
 }
 
 .statusWarning {
   margin-top: 8px;
   padding: 8px 12px;
-  background-color: #fff2f0;
-  border: 1px solid #ffccc7;
+  background-color: var(--ant-error-1);
+  border: 1px solid var(--ant-error-3);
   border-radius: 6px;
   display: flex;
   align-items: center;
@@ -163,11 +163,11 @@
 }
 
 .statusWarningIcon {
-  color: #ff4d4f;
+  color: var(--color-error);
 }
 
 .statusWarningText {
-  color: #ff4d4f;
+  color: var(--color-error);
   font-size: 14px;
 }
 
@@ -189,23 +189,23 @@
 }
 
 .statusCardAvailable {
-  background-color: #f6ffed;
-  border-color: #b7eb8f;
+  background-color: var(--ant-success-1);
+  border-color: var(--ant-success-3);
 }
 
 .statusCardLoaned {
-  background-color: #fff7e6;
-  border-color: #ffd591;
+  background-color: var(--ant-warning-1);
+  border-color: var(--ant-warning-3);
 }
 
 .statusCardDisabled {
-  background-color: #fff2f0;
-  border-color: #ffccc7;
+  background-color: var(--ant-error-1);
+  border-color: var(--ant-error-3);
 }
 
 .statusCardRenovated {
-  background-color: #f0f8ff;
-  border-color: #91d5ff;
+  background-color: var(--ant-primary-1);
+  border-color: var(--ant-primary-3);
 }
 
 .statusNumber {
@@ -215,19 +215,19 @@
 }
 
 .statusNumberAvailable {
-  color: #52c41a;
+  color: var(--color-success);
 }
 
 .statusNumberLoaned {
-  color: #fa8c16;
+  color: var(--color-warning);
 }
 
 .statusNumberDisabled {
-  color: #ff4d4f;
+  color: var(--color-error);
 }
 
 .statusNumberRenovated {
-  color: #1890ff;
+  color: var(--color-primary);
 }
 
 .statusLabel {
@@ -235,19 +235,19 @@
 }
 
 .statusLabelAvailable {
-  color: #52c41a;
+  color: var(--color-success);
 }
 
 .statusLabelLoaned {
-  color: #fa8c16;
+  color: var(--color-warning);
 }
 
 .statusLabelDisabled {
-  color: #ff4d4f;
+  color: var(--color-error);
 }
 
 .statusLabelRenovated {
-  color: #1890ff;
+  color: var(--color-primary);
 }
 
 .editStatusButton {
@@ -274,14 +274,14 @@
 
 .validationInfo {
   padding: 16px;
-  background-color: #f6ffed;
+  background-color: var(--ant-success-1);
   border-radius: 8px;
-  border: 1px solid #b7eb8f;
+  border: 1px solid var(--ant-success-3);
   margin-bottom: 20px;
 }
 
 .validationText {
-  color: #52c41a;
+  color: var(--color-success);
   font-size: 14px;
 }
 
@@ -340,15 +340,15 @@
 
 .currentDescriptionContent {
   padding: 16px;
-  background-color: #f8f9fa;
+  background-color: var(--fill-color-quaternary);
   border-radius: 8px;
-  border: 1px solid #e9ecef;
+  border: 1px solid var(--border-color-secondary);
 }
 
 .currentDescriptionText {
   font-size: 16px;
   line-height: 1.6;
-  color: #1f1f1f;
+  color: var(--text-color);
   white-space: pre-wrap;
 }
 

@@ -5,9 +5,24 @@ import { useParams } from "next/navigation";
 import { Input, Button, Card, Form, Typography, Space, InputNumber, Row, Col, App } from "antd";
 import { ArrowLeftOutlined, SaveOutlined, BookOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Book } from "@/app/types/book";
 import styles from "../../../styles/pages/books/detail/edit/EditBook.module.css";
+import { RESOURCES, STATUS_TYPES, STATUS_LABELS } from "@/app/constants/bookEditConstants";
+import { 
+  createNotificationConfig, 
+  getStatusClass, 
+  getFormValidationRules, 
+  getUIText, 
+  getFormConfig,
+  getResponsiveConfig,
+  validateStatusTotal,
+  calculateStatusTotal,
+  getRouteHelpers,
+  getRedirectHelpers,
+  getBreadcrumbHelpers
+} from "@/app/utils/bookEditHelpers";
+import { useEditBookValidation } from "@/app/hooks/useEditBookValidation";
 
 const { Title, Text } = Typography;
 const { TextArea } = Input;
@@ -22,10 +37,13 @@ export default function EditBook() {
   const [currentTotal, setCurrentTotal] = useState<number>(0);
   const [stateBookData, setStateBookData] = useState<Book>();
   const { notification } = App.useApp();
+
+  // Zod validation hooks
+  const { description, status } = useEditBookValidation();
   
-  const { mutate: updateBook, isPending: isUpdating } = useUpdate();
+  const { mutate: updateBook, isLoading: isUpdating } = useUpdate();
   const { data: bookData, isLoading: isBookLoading, refetch } = useOne({
-    resource: "books",
+    resource: RESOURCES.BOOKS,
     id: id as string,
   });
 
@@ -37,68 +55,82 @@ export default function EditBook() {
     }
   }, [bookData, form]);
 
-  const updateCurrentTotal = (available: number, loaned: number, disabled: number, renovated: number) => {
-    setCurrentTotal(available + loaned + disabled + renovated);
-  };
+  const updateCurrentTotal = useCallback((available: number, loaned: number, disabled: number, renovated: number) => {
+    setCurrentTotal(calculateStatusTotal(available, loaned, disabled, renovated));
+  }, []);
 
-  const onFinish = (values: { description: string }) => {
-    updateBook({
-      resource: "books",
-      id: id as string,
-      values: { description: values.description },
-      successNotification: { message: "Update successful", description: "Book description has been updated", type: "success" },
-      errorNotification: { message: "Update failed", description: "Could not update book description", type: "error" },
-    }, {
-      onSuccess: () => {
-        notification.success({ message: "Success", description: "Book description updated successfully!" });
-        // Refetch data to get the latest information from database
-        refetch();
+  const onFinish = useCallback(async (values: { description: string }) => {
+    const success = await description.handleDescriptionSubmit(
+      form,
+      values,
+      async (validatedData) => {
+        updateBook({
+          resource: RESOURCES.BOOKS,
+          id: id as string,
+          values: { description: validatedData.description },
+          successNotification: { ...createNotificationConfig.success.updateSuccessful(), type: "success" },
+          errorNotification: { ...createNotificationConfig.error.updateFailed(), type: "error" },
+        }, {
+          onSuccess: () => {
+            notification.success(createNotificationConfig.success.bookDescriptionUpdated());
+            // Refetch data to get the latest information from database
+            refetch();
+          },
+        });
       },
-    });
-  };
+      (errors) => {
+        console.error('Description validation errors:', errors);
+        notification.error({
+          message: 'Validation Error',
+          description: 'Please check the description for errors'
+        });
+      }
+    );
+  }, [description, form, updateBook, id, notification, refetch]);
 
-  const onStatusFinish = (values: { available: number; loaned: number; disabled: number; renovated: number }) => {
-    // Validation: Check if total remains the same (num should not change)
-    if (!stateBookData || currentTotal !== stateBookData.num) {
-      notification.error({ 
-        message: "Validation Error", 
-        description: `Total must equal ${stateBookData?.num} (current total: ${currentTotal})` 
-      });
+  const onStatusFinish = useCallback(async (values: { available: number; loaned: number; disabled: number; renovated: number }) => {
+    // Additional validation: Check if total remains the same (num should not change)
+    if (!stateBookData || !validateStatusTotal(currentTotal, stateBookData.num)) {
+      notification.error(createNotificationConfig.error.validationError(stateBookData?.num || 0, currentTotal));
       return;
     }
 
-    // Validation: Check if loaned count doesn't increase (optional - you can remove this if you want to allow loaned to increase)
-    // if (values.loaned > book.status.loaned) {
-    //   notification.error({ 
-    //     message: "Validation Error", 
-    //     description: `Loaned count cannot increase. Current: ${book.status.loaned}, New: ${values.loaned}` 
-    //   });
-    //   return;
-    // }
-
-    // Update book status
-    updateBook({
-      resource: "books",
-      id: id as string,
-      values: {
-        status: {
-          available: values.available,
-          loaned: values.loaned,
-          disabled: values.disabled,
-          renovated: values.renovated
-        }
+    const success = await status.handleStatusSubmit(
+      statusForm,
+      values,
+      async (validatedData) => {
+        // Update book status
+        updateBook({
+          resource: RESOURCES.BOOKS,
+          id: id as string,
+          values: {
+            status: {
+              available: validatedData.available,
+              loaned: validatedData.loaned,
+              disabled: validatedData.disabled,
+              renovated: validatedData.renovated
+            }
+          },
+          successNotification: { ...createNotificationConfig.success.statusUpdateSuccessful(), type: "success" },
+          errorNotification: { ...createNotificationConfig.error.statusUpdateFailed(), type: "error" },
+        }, {
+          onSuccess: () => {
+            notification.success(createNotificationConfig.success.bookStatusUpdated());
+            setIsEditingStatus(false);
+            // Refetch data to get the latest information from database
+            refetch();
+          },
+        });
       },
-      successNotification: { message: "Status update successful", description: "Book status has been updated", type: "success" },
-      errorNotification: { message: "Status update failed", description: "Could not update book status", type: "error" },
-    }, {
-      onSuccess: () => {
-        notification.success({ message: "Success", description: "Book status updated successfully!" });
-        setIsEditingStatus(false);
-        // Refetch data to get the latest information from database
-        refetch();
-      },
-    });
-  };
+      (errors) => {
+        console.error('Status validation errors:', errors);
+        notification.error({
+          message: 'Validation Error',
+          description: 'Please check the status values for errors'
+        });
+      }
+    );
+  }, [status, statusForm, stateBookData, currentTotal, notification, updateBook, id, refetch]);
 
   if (isBookLoading) {
     return (
@@ -117,63 +149,78 @@ export default function EditBook() {
         <div className={styles.errorContent}>
           <BookOutlined className={styles.errorIcon} />
           <Title level={3} className={styles.errorTitle}>Book not found</Title>
-          <Link href="/books"><Button type="primary" className={styles.errorButton}>Back to books</Button></Link>
+          <Link href={getRouteHelpers.getBooksUrl()}><Button type="primary" className={styles.errorButton}>Back to books</Button></Link>
         </div>
       </div>
     );
   }
   
-  const renderStatusCard = (type: 'available' | 'loaned' | 'disabled' | 'renovated', value: number, label: string) => {
-    const statusClassMap = {
-      available: styles.statusCardAvailable,
-      loaned: styles.statusCardLoaned,
-      disabled: styles.statusCardDisabled,
-      renovated: styles.statusCardRenovated
-    };
-    
-    const numberClassMap = {
-      available: styles.statusNumberAvailable,
-      loaned: styles.statusNumberLoaned,
-      disabled: styles.statusNumberDisabled,
-      renovated: styles.statusNumberRenovated
-    };
-    
-    const labelClassMap = {
-      available: styles.statusLabelAvailable,
-      loaned: styles.statusLabelLoaned,
-      disabled: styles.statusLabelDisabled,
-      renovated: styles.statusLabelRenovated
-    };
+  const renderStatusCard = useCallback((type: 'available' | 'loaned' | 'disabled' | 'renovated', value: number, label: string) => {
+    const responsiveConfig = getResponsiveConfig.statusCards();
     
     return (
-      <Col xs={12} sm={6}>
-        <div className={`${styles.statusCard} ${statusClassMap[type]}`}>
-          <div className={`${styles.statusNumber} ${numberClassMap[type]}`}>{value}</div>
-          <Text className={`${styles.statusLabel} ${labelClassMap[type]}`}>{label}</Text>
+      <Col xs={responsiveConfig.xs} sm={responsiveConfig.sm}>
+        <div className={`${styles.statusCard} ${styles[getStatusClass(type, 'card')]}`}>
+          <div className={`${styles.statusNumber} ${styles[getStatusClass(type, 'number')]}`}>{value}</div>
+          <Text className={`${styles.statusLabel} ${styles[getStatusClass(type, 'label')]}`}>{label}</Text>
         </div>
       </Col>
     );
-  };
+  }, [styles]);
 
-  const renderInputField = (name: string, label: string, max: number, onChange: (value: number | null) => void) => (
-    <Col xs={12} sm={6}>
-      <Form.Item label={label} name={name} rules={[{ required: true, message: 'Required!' }, { type: 'number', min: 0, message: 'Must be >= 0!' }]}>
-        <InputNumber
-          className={styles.inputField}
-          min={0}
-          max={max}
-          placeholder={label}
-          onChange={onChange}
-        />
-      </Form.Item>
-    </Col>
-  );
+  const renderInputField = useCallback((name: string, label: string, max: number, onChange: (value: number | null) => void) => {
+    const responsiveConfig = getResponsiveConfig.inputFields();
+    const inputConfig = getFormConfig.inputNumber(name as any);
+    
+    return (
+      <Col xs={responsiveConfig.xs} sm={responsiveConfig.sm}>
+        <Form.Item label={label} name={name} rules={status.getStatusRules(name as any)}>
+          <InputNumber
+            className={styles.inputField}
+            min={inputConfig.min}
+            max={max}
+            placeholder={inputConfig.placeholder}
+            onChange={onChange}
+          />
+        </Form.Item>
+      </Col>
+    );
+  }, [styles]);
+
+  // Optimized callback functions for inline handlers
+  const handleEditStatusClick = useCallback(() => {
+    setIsEditingStatus(true);
+  }, []);
+
+  const handleCancelEdit = useCallback(() => {
+    setIsEditingStatus(false);
+    statusForm.resetFields();
+    if (stateBookData) {
+      const total = stateBookData.status.available + stateBookData.status.loaned + stateBookData.status.disabled + stateBookData.status.renovated;
+      setCurrentTotal(total);
+    }
+  }, [statusForm, stateBookData]);
+
+  const handleAvailableChange = useCallback((value: number | null) => {
+    const currentValues = statusForm.getFieldsValue();
+    updateCurrentTotal(value || 0, currentValues.loaned || 0, currentValues.disabled || 0, currentValues.renovated || 0);
+  }, [statusForm, updateCurrentTotal]);
+
+  const handleDisabledChange = useCallback((value: number | null) => {
+    const currentValues = statusForm.getFieldsValue();
+    updateCurrentTotal(currentValues.available || 0, currentValues.loaned || 0, value || 0, currentValues.renovated || 0);
+  }, [statusForm, updateCurrentTotal]);
+
+  const handleRenovatedChange = useCallback((value: number | null) => {
+    const currentValues = statusForm.getFieldsValue();
+    updateCurrentTotal(currentValues.available || 0, currentValues.loaned || 0, currentValues.disabled || 0, value || 0);
+  }, [statusForm, updateCurrentTotal]);
 
   return (
     <div className={styles.mainContainer}>
       <div className={styles.headerSection}>
         <div className={styles.headerContent}>
-          <Link href={`/books/${id}`}>
+          <Link href={getRouteHelpers.getBookDetailUrl(id as string)}>
             <Button type="text" icon={<ArrowLeftOutlined />} className={styles.backButton}>
               Back to book detail
             </Button>
@@ -202,13 +249,13 @@ export default function EditBook() {
         >
           <div className={styles.statusInfo}>
             <Text strong className={styles.statusInfoText}>
-              Total Copies (num): {stateBookData?.num} • Current Total: {currentTotal}
+              {getUIText.statusInfo(stateBookData?.num || 0, currentTotal)}
             </Text>
             {currentTotal !== stateBookData?.num && (
               <div className={styles.statusWarning}>
                 <ExclamationCircleOutlined className={styles.statusWarningIcon} />
                 <Text className={styles.statusWarningText}>
-                  Warning: Current total ({currentTotal}) doesn't match total copies ({stateBookData?.num})
+                  {getUIText.statusWarning(currentTotal, stateBookData?.num || 0)}
                 </Text>
               </div>
             )}
@@ -217,13 +264,13 @@ export default function EditBook() {
           {!isEditingStatus ? (
             <div>
               <Row gutter={[16, 16]} className={styles.statusCardsContainer}>
-                {renderStatusCard('available', stateBookData?.status?.available || 0, 'Available')}
-                {renderStatusCard('loaned', stateBookData?.status?.loaned || 0, 'Loaned')}
-                {renderStatusCard('disabled', stateBookData?.status?.disabled || 0, 'Disabled')}
-                {renderStatusCard('renovated', stateBookData?.status?.renovated || 0, 'Renovated')}
+                {renderStatusCard(STATUS_TYPES.AVAILABLE, stateBookData?.status?.available || 0, STATUS_LABELS.AVAILABLE)}
+                {renderStatusCard(STATUS_TYPES.LOANED, stateBookData?.status?.loaned || 0, STATUS_LABELS.LOANED)}
+                {renderStatusCard(STATUS_TYPES.DISABLED, stateBookData?.status?.disabled || 0, STATUS_LABELS.DISABLED)}
+                {renderStatusCard(STATUS_TYPES.RENOVATED, stateBookData?.status?.renovated || 0, STATUS_LABELS.RENOVATED)}
               </Row>
               <div className={styles.editStatusButtonContainer}>
-                <Button type="primary" onClick={() => setIsEditingStatus(true)} className={styles.editStatusButton}>
+                <Button type="primary" onClick={handleEditStatusClick} className={styles.editStatusButton}>
                   Edit Status
                 </Button>
               </div>
@@ -242,10 +289,7 @@ export default function EditBook() {
               }}
             >
               <Row gutter={[16, 16]} className={styles.formRow}>
-                {renderInputField('available', 'Available', stateBookData?.num || 0, (value) => {
-                  const currentValues = statusForm.getFieldsValue();
-                  updateCurrentTotal(value || 0, currentValues.loaned || 0, currentValues.disabled || 0, currentValues.renovated || 0);
-                })}
+                {renderInputField('available', 'Available', stateBookData?.num || 0, handleAvailableChange)}
                  <Col xs={12} sm={6}>
                    <Form.Item label="Loaned" name="loaned">
                      <InputNumber
@@ -256,36 +300,19 @@ export default function EditBook() {
                      />
                    </Form.Item>
                  </Col>
-                {renderInputField('disabled', 'Disabled', stateBookData?.num || 0, (value) => {
-                  const currentValues = statusForm.getFieldsValue();
-                  updateCurrentTotal(currentValues.available || 0, currentValues.loaned || 0, value || 0, currentValues.renovated || 0);
-                })}
-                {renderInputField('renovated', 'Renovated', stateBookData?.num || 0, (value) => {
-                  const currentValues = statusForm.getFieldsValue();
-                  updateCurrentTotal(currentValues.available || 0, currentValues.loaned || 0, currentValues.disabled || 0, value || 0);
-                })}
+                {renderInputField('disabled', 'Disabled', stateBookData?.num || 0, handleDisabledChange)}
+                {renderInputField('renovated', 'Renovated', stateBookData?.num || 0, handleRenovatedChange)}
               </Row>
 
                 <div className={styles.validationInfo}>
-                 <Text className={styles.validationText}>
-                   <strong>Validation Rules:</strong><br/>
-                   • Total must equal {stateBookData?.num} copies (Current: {currentTotal})<br/>
-                   • All values must be &gt;= 0<br/>
-                   • <strong>Note: Total copies (num) will remain unchanged</strong><br/>
-                   • <strong>Note: Loaned count cannot be modified (read-only)</strong>
-                 </Text>
+                 <Text className={styles.validationText} dangerouslySetInnerHTML={{
+                   __html: getUIText.validationRules(stateBookData?.num || 0, currentTotal)
+                 }} />
                </div>
 
               <Form.Item className={styles.formActions}>
                 <Space size="middle" className={styles.formActionsSpace}>
-                  <Button onClick={() => {
-                    setIsEditingStatus(false);
-                    statusForm.resetFields();
-                    if (stateBookData) {
-                      const total = stateBookData.status.available + stateBookData.status.loaned + stateBookData.status.disabled + stateBookData.status.renovated;
-                      setCurrentTotal(total);
-                    }
-                  }} className={styles.cancelButton}>Cancel</Button>
+                  <Button onClick={handleCancelEdit} className={styles.cancelButton}>Cancel</Button>
                   <Button type="primary" htmlType="submit" loading={isUpdating} className={styles.updateStatusButton}>
                     {isUpdating ? 'Updating...' : 'Update Status'}
                   </Button>
@@ -306,14 +333,10 @@ export default function EditBook() {
             <Form.Item
               label="Book description"
               name="description"
-              rules={[
-                { required: true, message: 'Please enter book description!' },
-                { min: 10, message: 'Book description must be at least 10 characters!' },
-              ]}
+              rules={description.getDescriptionRules()}
             >
               <TextArea
-                rows={6}
-                placeholder="Enter book description..."
+                {...getFormConfig.textarea()}
                 className={styles.descriptionTextArea}
               />
             </Form.Item>
